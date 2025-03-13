@@ -1,11 +1,10 @@
-# SpendWise Database Schema (Firebase Firestore)
+# SpendWise 
 
-## Overview
-This document outlines the database schema for SpendWise using Firebase Firestore. The schema is designed to support expense tracking, budgeting, income management, recurring payments, financial goals, and notifications, ensuring efficient querying and data retrieval.
+## Database Schema (Firebase Firestore)
 
-## Collections and Relationships
+### Collections and Relationships
 
-### 1. Users Collection
+#### 1. Users Collection
 **Path:** `/users/{user_id}`  
 Stores user information and acts as the root collection for all user-related data.
 
@@ -21,7 +20,7 @@ Stores user information and acts as the root collection for all user-related dat
 
 ---
 
-### 2. Expenses Collection
+#### 2. Expenses Collection
 **Path:** `/users/{user_id}/expenses/{expense_id}`  
 Stores all expenses related to a specific user.
 
@@ -40,7 +39,7 @@ Stores all expenses related to a specific user.
 
 ---
 
-### 3. Budgets Collection
+#### 3. Budgets Collection
 **Path:** `/users/{user_id}/budgets/{budget_id}`  
 Stores budget allocations and usage tracking.
 
@@ -57,7 +56,7 @@ Stores budget allocations and usage tracking.
 
 ---
 
-### 4. Income Collection
+#### 4. Income Collection
 **Path:** `/users/{user_id}/income/{income_id}`  
 Tracks income sources and earnings.
 
@@ -73,7 +72,7 @@ Tracks income sources and earnings.
 
 ---
 
-### 5. Goals Collection
+#### 5. Goals Collection
 **Path:** `/users/{user_id}/goals/{goal_id}`  
 Stores financial goals and progress tracking.
 
@@ -90,7 +89,7 @@ Stores financial goals and progress tracking.
 
 ---
 
-### 6. Recurring Payments Collection
+#### 6. Recurring Payments Collection
 **Path:** `/users/{user_id}/recurring_payments/{payment_id}`  
 Manages recurring transactions such as subscriptions, loans, or utility bills.
 
@@ -107,7 +106,7 @@ Manages recurring transactions such as subscriptions, loans, or utility bills.
 
 ---
 
-### 7. Notifications Collection
+#### 7. Notifications Collection
 **Path:** `/users/{user_id}/notifications/{notification_id}`  
 Stores system-generated notifications for budget alerts, due payments, or financial insights.
 
@@ -124,7 +123,7 @@ Stores system-generated notifications for budget alerts, due payments, or financ
 
 ---
 
-## Querying and Custom Functions
+### Querying and Custom Functions
 To enable efficient querying and retrieval, Firestore’s **subcollections** structure ensures that:
 - Expenses, budgets, income, and goals are **easily accessible per user**.
 - Queries can be **optimized using Firestore indexes**.
