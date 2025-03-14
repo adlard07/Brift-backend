@@ -1,5 +1,5 @@
 # SpendWise 
-
+---
 ## Database Schema (Firebase Firestore)
 
 ### Collections and Relationships
@@ -123,11 +123,7 @@ Stores system-generated notifications for budget alerts, due payments, or financ
 
 ---
 
-### Querying and Custom Functions
-To enable efficient querying and retrieval, Firestore’s **subcollections** structure ensures that:
-- Expenses, budgets, income, and goals are **easily accessible per user**.
-- Queries can be **optimized using Firestore indexes**.
-- Custom functions can filter **expenses by category, date range, or budget limits**.
-- Aggregations can be performed using **Firebase Cloud Functions** for advanced analytics.
-
-This schema is designed for scalability, ensuring efficient data organization and querying within Firestore.
+### Issues occured and their resolution while development:
+1.
+- Issue: the `firebase_admin` module in python wasn't able to read project credentials.
+- Resolved by: using `requests` module in python to request the firebase reatime database API and wrote custom functions using GET, POST, PUT and DELETE request type to communicate with firebase.
