@@ -124,5 +124,5 @@ Stores system-generated notifications for budget alerts, due payments, or financ
 ---
 
 ### Issues occured and their resolution while development:
-1. 	Issue: the `firebase_admin` module in python wasn't able to read project credentials.
-	Resolved by: using `requests` module in python to request the firebase reatime database API and wrote custom functions using GET, POST, PUT and DELETE request type to communicate with firebase.
+1. 	- Issue: the `firebase_admin` module in python wasn't able to read project credentials.
+	- Resolved by: using `requests` module in python to request the firebase reatime database API and wrote custom functions using GET, POST, PUT and DELETE request type to communicate with firebase.
