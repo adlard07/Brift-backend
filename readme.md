@@ -1,7 +1,7 @@
 # SpendWise 
----
-## Database Schema (Firebase Firestore)
 
+
+## Database Schema (Firebase Firestore)
 ### Collections and Relationships
 
 #### 1. Users Collection
@@ -18,7 +18,6 @@ Stores user information and acts as the root collection for all user-related dat
 **Relationships:**
 - Each user has **subcollections** for expenses, budgets, income, goals, recurring payments, and notifications.
 
----
 
 #### 2. Expenses Collection
 **Path:** `/users/{user_id}/expenses/{expense_id}`  
@@ -37,7 +36,6 @@ Stores all expenses related to a specific user.
 - Linked to `users` collection through `user_id` in the parent document path.
 - Can be cross-referenced with `budgets` for spending tracking.
 
----
 
 #### 3. Budgets Collection
 **Path:** `/users/{user_id}/budgets/{budget_id}`  
@@ -48,13 +46,10 @@ Stores budget allocations and usage tracking.
 - `category`: Expense category associated with the budget.
 - `amount`: Allocated budget amount.
 - `period`: Duration (e.g., Weekly, Monthly).
-- `used_amount`: Amount already spent.
-- `created_at`: Timestamp of budget creation.
 
 **Relationships:**
 - Linked to `expenses` to track spending against budget.
 
----
 
 #### 4. Income Collection
 **Path:** `/users/{user_id}/income/{income_id}`  
@@ -70,7 +65,6 @@ Tracks income sources and earnings.
 **Relationships:**
 - Linked to `users` collection.
 
----
 
 #### 5. Goals Collection
 **Path:** `/users/{user_id}/goals/{goal_id}`  
@@ -87,7 +81,6 @@ Stores financial goals and progress tracking.
 **Relationships:**
 - Linked to `income` collection to track funding sources.
 
----
 
 #### 6. Recurring Payments Collection
 **Path:** `/users/{user_id}/recurring_payments/{payment_id}`  
@@ -103,8 +96,6 @@ Manages recurring transactions such as subscriptions, loans, or utility bills.
 
 **Relationships:**
 - Linked to `expenses` collection to track recurring deductions.
-
----
 
 #### 7. Notifications Collection
 **Path:** `/users/{user_id}/notifications/{notification_id}`  
@@ -123,6 +114,6 @@ Stores system-generated notifications for budget alerts, due payments, or financ
 
 ---
 
-### Issues occured and their resolution while development:
+### Issues occured and resolution:
 1. 	- Issue: the `firebase_admin` module in python wasn't able to read project credentials.
-	- Resolved by: using `requests` module in python to request the firebase reatime database API and wrote custom functions using GET, POST, PUT and DELETE request type to communicate with firebase.
+	- Resolved by: using `requests` module in python to request the firebase reatime database API and wrote custom functions using GET, POST, PUT, PATCH and DELETE request type to communicate with firebase.
