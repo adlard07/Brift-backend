@@ -19,6 +19,7 @@ class CreateFirebaseDB:
     def __post_init__(self):
         try:
             requests.put(self.base_url)
+            logging.info('Firebase Realtime Database Initialised.')
         except Exception as e:
             logging.info(f'Error occured: {e}')
 
