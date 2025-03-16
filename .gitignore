@@ -1,6 +1,5 @@
 .env
 creds.json
-* .pyc
-__pycache__
+__pycache__/
 **/__pycache__/
 test.py
