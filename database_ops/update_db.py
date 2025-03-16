@@ -7,7 +7,6 @@ from datetime import datetime
 
 from logger import logging
 
-# Load environment variables
 load_dotenv()
 
 def check_response(response) -> dict:
@@ -184,7 +183,26 @@ class UpdateFirebase:
 
 if __name__=="__main__":
     firebase_updater = UpdateFirebase()
-    response = firebase_updater.update_user(
-        user_id="4cd6cdc9-00f1-11f0-9eed-00155d016700", 
-        username="adlard")
+    user_id = 'af02a499-01b6-11f0-9306-00155d016700'
+
+    # response = firebase_updater.update_user(
+    #     user_id="af02a499-01b6-11f0-9306-00155d016700", 
+    #     username="adlard")
+
+    # response = firebase_updater.update_expense(
+    #     user_id=user_id, 
+    #     expense_id='cdd56270-01b6-11f0-bd4a-00155d016700',
+    #     category='Food',
+    #     title='Biscuits')
+
+    # response = firebase_updater.update_budget(
+    #     user_id=user_id,
+    #     budget_id='c14697f6-01b6-11f0-9d09-00155d016700',
+    #     amount=2000)
+
+    # response = firebase_updater.update_income(
+    #     user_id=user_id,
+    #     income_id='c19d56b8-01b6-11f0-9501-00155d016700',
+    #     amount=33000)
+
     print(response)
