@@ -1,7 +1,3 @@
-Sure! Here's a complete **README.md** file tailored for your backend project using **FastAPI**, following your Firebase Firestore schema and setup preferences (Python backend, serverless-ready, custom logging, Google Auth, `.env`, `creds.json`, etc.).
-
----
-
 # 📊 SpendWise Backend
 
 **A serverless backend API for SpendWise – A modern personal finance and budgeting mobile app, built with Python + FastAPI + Firebase Firestore.**
@@ -168,16 +164,16 @@ uvicorn main:app --reload
 
 | Endpoint | Method | Description |
 |---------|--------|-------------|
-| `/users/` | GET | Get current user info |
+| `/users/` | POST | Get current user info |
 | `/expenses/` | POST | Add new expense |
 | `/expenses/{id}` | PUT | Edit expense |
-| `/budgets/` | GET | List budgets |
-| `/income/summary` | GET | Monthly income overview |
-| `/goals/progress` | GET | Goal progress by user |
-| `/notifications/` | GET | Get unread alerts |
-| `/reports/monthly` | GET | Auto-generated report |
-| `/networth/` | GET | Net worth summary |
-| `/debts/strategy` | GET | Debt payoff suggestion |
+| `/budgets/` | POST | List budgets |
+| `/income/summary` | POST | Monthly income overview |
+| `/goals/progress` | POST | Goal progress by user |
+| `/notifications/` | POST | Get unread alerts |
+| `/reports/monthly` | POST | Auto-generated report |
+| `/networth/` | POST | Net worth summary |
+| `/debts/strategy` | POST | Debt payoff suggestion |
 
 ---
 
@@ -225,7 +221,3 @@ Compatible with:
 
 **SpendWise Dev Team**  
 *Built with 💸 by financial nerds.*
-
----
-
-Let me know if you want the actual `main.py` or a sample router file to go with this!
