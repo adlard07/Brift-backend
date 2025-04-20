@@ -1,6 +1,5 @@
 .env
 creds.json
-__pycache__
-database_ops/__pycache__/
+*__pycache__*
 venv
 test.py

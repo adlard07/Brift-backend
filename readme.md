@@ -57,7 +57,8 @@ SpendWise is a cross-platform mobile app built with **Flutter** and **Firebase**
 |---------------|---------------------|
 | **Frontend**  | Flutter (Dart)      |
 | **Backend**   | Firebase Firestore  |
-| **Auth**      | Firebase Auth       |
+| **Auth**      | Python              |
+| **Backend**   | FastAPI             |
 | **Storage**   | Firebase Storage    |
 | **OCR**       | Google ML Kit / Tesseract OCR |
 | **Notifications** | Firebase Cloud Messaging |
@@ -81,8 +82,6 @@ SpendWise is a cross-platform mobile app built with **Flutter** and **Firebase**
   - Amounts, categories, timestamps, statuses, etc.
   - Relationships across expenses, budgets, and goals.
 
-See [`schema.md`](./schema.md) for full details.
-
 ---
 
 ## 🚀 Getting Started
@@ -105,7 +104,7 @@ See [`schema.md`](./schema.md) for full details.
    - `GoogleService-Info.plist` in `ios/Runner/`
 
 5. Enable:
-   - **Authentication** (Email/Password, Google, Apple)
+   - **Authentication** (Email/Password, Google)
    - **Firestore Database**
    - **Firebase Storage**
    - **Cloud Messaging** (for notifications)
