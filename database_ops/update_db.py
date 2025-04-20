@@ -23,7 +23,7 @@ class UpdateFirebase:
     auth_client: FirebaseAuth = FirebaseAuth()
 
     def get_access_token(self):
-        return self.auth_client.get_access_token()
+        return self.auth_client.get_firebase_access_token()
 
     def _patch(self, endpoint: str, data: dict) -> dict:
         """Reusable patch request"""

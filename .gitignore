@@ -2,5 +2,5 @@
 creds.json
 __pycache__
 database_ops/__pycache__/
-venv	
+venv
 test.py

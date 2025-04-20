@@ -2,6 +2,9 @@ import firebase_admin
 from firebase_admin import credentials
 import time
 import logging
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class FirebaseAuth:
     def __init__(self, creds_path="creds.json"):
@@ -11,7 +14,7 @@ class FirebaseAuth:
         self.token = None
         self.expiry_time = 0
 
-    def get_access_token(self):
+    def get_firebase_access_token(self):
         """Return a cached token or refresh if expired."""
         try:
             # Refresh token if not available or expired
@@ -24,6 +27,8 @@ class FirebaseAuth:
         except Exception as e:
             logging.error(f"Error authenticating Firebase service account: {e}")
             return None
+
+    def create_access_token(self, )
 
 
 if __name__ == "__main__":

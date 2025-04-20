@@ -23,7 +23,7 @@ class DeleteFirebase:
     auth_client: FirebaseAuth = FirebaseAuth()
 
     def get_access_token(self):
-        return self.auth_client.get_access_token()
+        return self.auth_client.get_firebase_access_token()
 
     def _delete(self, endpoint: str) -> dict:
         """Reusable delete request"""

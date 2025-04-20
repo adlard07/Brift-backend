@@ -2,3 +2,5 @@ python-dotenv
 requests
 fastapi
 uvicorn
+mangum
+firebase-admin
