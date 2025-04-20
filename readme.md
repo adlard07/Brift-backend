@@ -118,8 +118,8 @@
 1. **Clone the repo**
 
 ```bash
-git clone https://github.com/your-username/spendwise-backend.git
-cd spendwise-backend
+git clone https://github.com/adlard07/SpendWise-backend.git
+cd Spendwise-Backend
 ```
 
 2. **Install dependencies**
