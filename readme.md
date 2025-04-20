@@ -1,79 +1,82 @@
-Here's a complete `README.md` file for your **SpendWise** backend project, built using **FastAPI**, deployed on a **serverless architecture**, and integrated with **Firebase Firestore** as the database.
-
-This README assumes you've structured your code following best practices (e.g., modular routes, services, Firestore clients, auth middlewares, etc.), and you have a deployment setup like **Google Cloud Functions**, **Vercel Serverless Functions**, or **AWS Lambda via Zappa or Serverless Framework**.
+Sure! Here's a complete **README.md** file tailored for your backend project using **FastAPI**, following your Firebase Firestore schema and setup preferences (Python backend, serverless-ready, custom logging, Google Auth, `.env`, `creds.json`, etc.).
 
 ---
 
-```markdown
-# 💸 SpendWise Backend
+# 📊 SpendWise Backend
 
-> Backend API for SpendWise – a smart personal finance tracker built with **FastAPI**, using **Firebase Firestore** as a database and deployed on **serverless infrastructure**.
-
----
-
-## ⚙️ Tech Stack
-
-- **FastAPI** – High-performance Python web framework
-- **Firebase Firestore** – NoSQL document database
-- **Google OAuth 2.0** – Authentication
-- **Python 3.10+**
-- **Serverless Deployment** – e.g., Google Cloud Functions, Vercel, AWS Lambda
-- **Logging** – Custom structured logging for all API events
+**A serverless backend API for SpendWise – A modern personal finance and budgeting mobile app, built with Python + FastAPI + Firebase Firestore.**
 
 ---
 
-## 📦 Features (Backend Functionality)
+## 🚀 Features & Functionality (Backend)
 
-### 🧑‍💼 Users
-- Register new user (with hashed password)
-- Login (JWT or session-based)
-- Google OAuth login
-- Fetch user profile
-- Update user info
-- Delete user account
+### 1. **User Management**
+- Register / Login via Google Auth (OAuth2)
+- Firebase-based user creation and session management
+- Token validation middleware
+- Stores user details in Firestore (`/users/{user_id}`)
 
-### 📒 Expenses
-- Create a new expense entry
-- Fetch all expenses (with filters: category, date range, amount)
-- Update or delete an expense
-- Upload and link receipt image (using Firebase Storage)
-- Aggregate expenses (monthly/yearly summary)
+### 2. **Expense Management**
+- Add, edit, delete, list expenses (`/users/{user_id}/expenses`)
+- Filter by date, category, or amount
+- Store receipt URL (if available)
+- Backend aggregation for spending summaries (monthly, weekly)
 
-### 💰 Income
-- Add new income entry
-- Fetch all income sources
-- Update income details
-- Calculate monthly/yearly income totals
+### 3. **Budget Tracking**
+- Create/edit/delete budgets per category
+- Track budget vs. actual spending (computed from expenses)
+- Trigger budget limit notifications
 
-### 📊 Budgets
-- Set a budget for a category
-- Fetch budgets with usage tracking
-- Update or delete budget
-- Trigger alerts when budget exceeds threshold
+### 4. **Income Tracking**
+- Add and manage income sources (`/users/{user_id}/income`)
+- Monthly summaries
+- Frequency pattern parsing (e.g., Monthly, Weekly)
 
-### 🥅 Goals
-- Create financial goals
-- Track progress toward savings goals
-- Update saved amount
-- Mark goal as completed
+### 5. **Goals Management**
+- Set and update financial goals (`/users/{user_id}/goals`)
+- Calculate progress dynamically
+- Support for deadlines and status updates (e.g., Completed)
 
-### 🔁 Recurring Payments
-- Add recurring bill/subscription
-- Fetch upcoming payments
-- Auto-generate recurring expenses
-- Enable/disable auto-deduction
+### 6. **Recurring Payments**
+- Add/edit recurring bills or subscriptions
+- Detect upcoming due dates
+- Link to expense records if auto-deduct enabled
 
-### 🔔 Notifications
-- Trigger budget or payment alerts
-- Fetch unread notifications
-- Mark notification as read
-- Delete notifications
+### 7. **Notifications Engine**
+- Trigger notifications for:
+  - Budget thresholds
+  - Upcoming recurring payments
+  - Goal deadlines
+- Mark notifications as read/unread
+- Scheduled jobs for time-based triggers
 
-### 🧠 AI + Insights (Pluggable)
-- Generate monthly reports
-- Forecast expenses based on history
-- Generate savings suggestions
-- Detect abnormal spending patterns
+### 8. **Reports and Insights**
+- Generate monthly summaries
+- AI-friendly endpoints (for AI assistant integration)
+- Provide category-level breakdowns and trends
+
+### 9. **Net Worth Calculation**
+- Track assets vs. liabilities
+- Compute net worth history
+- Allow updates on financial assets manually
+
+### 10. **Debt Management**
+- Track debt repayments
+- Calculate remaining balance & interest
+- Strategy endpoints (Snowball vs Avalanche)
+
+---
+
+## 🧠 Tech Stack
+
+- **Language:** Python 3.11+
+- **Framework:** FastAPI
+- **Database:** Firebase Firestore (NoSQL)
+- **Auth:** Google OAuth 2.0 (via `creds.json`)
+- **Serverless Ready:** Compatible with Vercel, AWS Lambda (via FastAPI Gateway)
+- **Logging:** Custom JSON logger using `logging` module
+- **Env Management:** `python-dotenv`
+- **Testing:** Pytest (recommended)
 
 ---
 
@@ -81,136 +84,148 @@ This README assumes you've structured your code following best practices (e.g., 
 
 ```
 .
+├── main.py
+├── requirements.txt
+├── .env
+├── creds.json
 ├── app/
-│   ├── main.py                 # Entry point
-│   ├── routes/                 # All API route handlers
-│   ├── services/               # Firestore logic, business logic
-│   ├── models/                 # Pydantic schemas
-│   ├── utils/                  # Logging, helpers, auth middleware
-│   ├── config.py               # Config loader
-├── creds.json                  # Google credentials (OAuth + Firebase Admin SDK)
-├── .env                        # Secret configs (Firestore keys, API tokens)
-├── requirements.txt            # Python dependencies
-└── README.md
+│   ├── routers/
+│   │   ├── users.py
+│   │   ├── expenses.py
+│   │   ├── budgets.py
+│   │   ├── income.py
+│   │   ├── goals.py
+│   │   ├── recurring.py
+│   │   ├── notifications.py
+│   │   ├── reports.py
+│   │   └── networth.py
+│   ├── core/
+│   │   ├── firestore_client.py
+│   │   ├── auth.py
+│   │   ├── logger.py
+│   │   └── utils.py
+│   └── models/
+│       ├── user.py
+│       ├── expense.py
+│       ├── budget.py
+│       ├── income.py
+│       ├── goal.py
+│       ├── recurring.py
+│       ├── notification.py
+│       └── report.py
 ```
 
 ---
 
-## 📄 Installation
+## 📦 Installation
 
 1. **Clone the repo**
+
 ```bash
-git clone https://github.com/yourusername/spendwise-backend.git
+git clone https://github.com/your-username/spendwise-backend.git
 cd spendwise-backend
 ```
 
-2. **Create virtual environment**
+2. **Install dependencies**
+
 ```bash
 python -m venv venv
-source venv/bin/activate
-```
-
-3. **Install dependencies**
-```bash
+source venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
-4. **Setup environment variables**
+3. **Add Environment Variables**
 
-Create a `.env` file:
+Create a `.env` file in the root with:
 
 ```env
-FIREBASE_PROJECT_ID=your_project_id
-FIREBASE_API_KEY=your_api_key
+PROJECT_ID=your-firebase-project-id
 GOOGLE_APPLICATION_CREDENTIALS=creds.json
-ALLOWED_ORIGINS=http://localhost,http://127.0.0.1
-JWT_SECRET=your_jwt_secret
+FIREBASE_API_KEY=your-firebase-api-key
 ```
 
-5. **Add Google credentials**
+4. **Add Firebase Credentials**
 
-Download your Firebase Admin SDK credentials and rename it as `creds.json`.
+- Place your Firebase Admin SDK credentials file as `creds.json` in the root.
 
----
-
-## 🚀 Run Locally
+5. **Run the server**
 
 ```bash
-uvicorn app.main:app --reload
+uvicorn main:app --reload
 ```
 
 ---
 
-## 🔐 Google Auth Setup
+## 🔐 Authentication
 
-- Go to **Google Cloud Console**
-- Enable **OAuth 2.0 API**
-- Download credentials as JSON → Save as `creds.json`
-- Ensure `GOOGLE_APPLICATION_CREDENTIALS` in `.env` points to this file.
-
----
-
-## ✅ API Endpoints (Examples)
-
-- `POST /auth/register` – Register user
-- `POST /auth/login` – Login with email/password
-- `POST /auth/google` – Google login
-- `GET /expenses/` – Fetch expenses
-- `POST /expenses/` – Add expense
-- `POST /budgets/` – Set budget
-- `GET /notifications/` – Get alerts
+- OAuth2 token validation via Firebase Admin SDK
+- Add token as `Authorization: Bearer <token>` header in requests
+- `@authenticated_user` decorator extracts and validates user info
 
 ---
 
-## 📈 Logging
+## 📊 Example Endpoints
 
-Structured JSON logging to stdout with user context:
-
-```json
-{
-  "level": "info",
-  "event": "create_expense",
-  "user_id": "abc123",
-  "timestamp": "2025-04-20T16:32:01",
-  "details": {
-    "category": "Food",
-    "amount": 25
-  }
-}
-```
+| Endpoint | Method | Description |
+|---------|--------|-------------|
+| `/users/` | GET | Get current user info |
+| `/expenses/` | POST | Add new expense |
+| `/expenses/{id}` | PUT | Edit expense |
+| `/budgets/` | GET | List budgets |
+| `/income/summary` | GET | Monthly income overview |
+| `/goals/progress` | GET | Goal progress by user |
+| `/notifications/` | GET | Get unread alerts |
+| `/reports/monthly` | GET | Auto-generated report |
+| `/networth/` | GET | Net worth summary |
+| `/debts/strategy` | GET | Debt payoff suggestion |
 
 ---
 
-## 🧪 Testing
-
-> Optional: Add later via `pytest` or `httpx`
-
----
-
-## ☁️ Deploying Serverless (Example: Google Cloud Functions)
+## 🧪 Sample Dev Workflow
 
 ```bash
-gcloud functions deploy spendwise-api \
-  --runtime python310 \
-  --trigger-http \
-  --allow-unauthenticated \
-  --entry-point app.main.app
+# Activate virtual environment
+source venv/bin/activate
+
+# Start local server
+uvicorn main:app --reload
+
+# Run unit tests
+pytest
 ```
 
 ---
 
-## 📜 License
+## 🔄 Deployment
 
-MIT License. Free to use and modify!
-
----
-
-## 🙌 Contributing
-
-Pull requests are welcome! Please open issues first to discuss changes.
-
-```
+Compatible with:
+- **Vercel (Python Serverless Functions)**
+- **AWS Lambda (with API Gateway)**
+- **Google Cloud Run / Firebase Hosting with Cloud Functions**
 
 ---
 
-Would you like me to generate the `requirements.txt` and a sample `.env` too?
+## 📚 Resources
+
+- [FastAPI Docs](https://fastapi.tiangolo.com/)
+- [Firebase Admin SDK](https://firebase.google.com/docs/admin/setup)
+- [Uvicorn ASGI Server](https://www.uvicorn.org/)
+- [Google Cloud Credentials](https://cloud.google.com/docs/authentication/getting-started)
+
+---
+
+## 📌 TODO (Optional Enhancements)
+- Add Redis caching for computed reports
+- Implement webhooks for reminders
+- Integrate OpenAI/Gemini for smart financial insights
+
+---
+
+## 🧑‍💻 Author
+
+**SpendWise Dev Team**  
+*Built with 💸 by financial nerds.*
+
+---
+
+Let me know if you want the actual `main.py` or a sample router file to go with this!
