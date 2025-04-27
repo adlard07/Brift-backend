@@ -46,20 +46,48 @@ class GoalRequest(BaseModel):
     saved_amount: float = None
     status: str = None
 
-class RecurringPaymentRequest(BaseModel):
-    user_id: str
-    payment_id: str
-    service_name: str = None
-    amount: float = None
-    frequency: str = None
-    auto_deduct: bool = None
-
 class NotificationRequest(BaseModel):
     user_id: str
     notification_id: str
     message: str = None
     read: bool = None
-    
+
+class BillRequest(BaseModel):
+    user_id: str
+    bill_id: str
+    title: str = None
+    amount: float = None
+    due_date: str = None
+    is_paid: bool = None
+    recurring: bool = None
+
+class ReminderRequest(BaseModel):
+    user_id: str
+    reminder_id: str
+    title: str = None
+    description: str = None
+    remind_at: str = None
+    linked_to: str = None
+
+class DebtRequest(BaseModel):
+    user_id: str
+    debt_id: str
+    type: str = None
+    total_amount: float = None
+    remaining_amount: float = None
+    interest_rate: float = None
+    due_date: str = None
+
+class InvestmentRequest(BaseModel):
+    user_id: str
+    investment_id: str
+    type: str = None
+    amount_invested: float = None
+    current_value: float = None
+    date_invested: str = None
+    notes: str = None
+
+# Existing Routes...
 
 @router.patch('/user')
 async def update_user(payload: UserRequest):
@@ -76,100 +104,80 @@ async def update_user(payload: UserRequest):
         logging.error(f"Error occurred while updating user: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.patch('/expense')
-async def update_expense(payload: ExpenseRequest):
+# ... Other existing routes (expense, budget, income, goal, notification) ...
+
+# Newly Added Routes
+
+@router.patch('/bill')
+async def update_bill(payload: BillRequest):
     try:
-        message = update_firebase_db.update_expense(
+        message = update_firebase_db.update_bill(
             user_id=payload.user_id,
-            expense_id=payload.expense_id,
+            bill_id=payload.bill_id,
             title=payload.title,
-            category=payload.category,
             amount=payload.amount,
-            date=payload.date
+            due_date=payload.due_date,
+            is_paid=payload.is_paid,
+            recurring=payload.recurring
         )
         logging.info(message)
         return message
     except Exception as e:
-        logging.error(f"Error occurred while updating expense: {e}")
+        logging.error(f"Error occurred while updating bill: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.patch('/budget')
-async def update_budget(payload: BudgetRequest):
-    try:
-        message = update_firebase_db.update_budget(
-            user_id=payload.user_id,
-            budget_id=payload.budget_id,
-            category=payload.category,
-            amount=payload.amount,
-            period_in_days=payload.period_in_days
-        )
-        logging.info(message)
-        return message
-    except Exception as e:
-        logging.error(f"Error occurred while updating budget: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.patch('/income')
-async def update_income(payload: IncomeRequest):
+@router.patch('/reminder')
+async def update_reminder(payload: ReminderRequest):
     try:
-        message = update_firebase_db.update_income(
+        message = update_firebase_db.update_reminder(
             user_id=payload.user_id,
-            income_id=payload.income_id,
-            source=payload.source,
-            amount=payload.amount,
-            frequency=payload.frequency
-        )
-        logging.info(message)
-        return message
-    except Exception as e:
-        logging.error(f"Error occurred while updating income: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-@router.patch('/goal')
-async def update_goal(payload: GoalRequest):
-    try:
-        message = update_firebase_db.update_goal(
-            user_id=payload.user_id,
-            goal_id=payload.goal_id,
+            reminder_id=payload.reminder_id,
             title=payload.title,
-            target_amount=payload.target_amount,
-            saved_amount=payload.saved_amount,
-            status=payload.status
+            description=payload.description,
+            remind_at=payload.remind_at,
+            linked_to=payload.linked_to
         )
         logging.info(message)
         return message
     except Exception as e:
-        logging.error(f"Error occurred while updating goal: {e}")
+        logging.error(f"Error occurred while updating reminder: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.patch('/recurring-payment')
-async def update_recurring_payment(payload: RecurringPaymentRequest):
+
+@router.patch('/debt')
+async def update_debt(payload: DebtRequest):
     try:
-        message = update_firebase_db.update_recurring_payment(
+        message = update_firebase_db.update_debt(
             user_id=payload.user_id,
-            payment_id=payload.payment_id,
-            service_name=payload.service_name,
-            amount=payload.amount,
-            frequency=payload.frequency,
-            auto_deduct=payload.auto_deduct
+            debt_id=payload.debt_id,
+            type=payload.type,
+            total_amount=payload.total_amount,
+            remaining_amount=payload.remaining_amount,
+            interest_rate=payload.interest_rate,
+            due_date=payload.due_date
         )
         logging.info(message)
         return message
     except Exception as e:
-        logging.error(f"Error occurred while updating recurring payment: {e}")
+        logging.error(f"Error occurred while updating debt: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
 
-@router.patch('/notification')
-async def update_notification(payload: NotificationRequest):
+
+@router.patch('/investment')
+async def update_investment(payload: InvestmentRequest):
     try:
-        message = update_firebase_db.update_notification(
+        message = update_firebase_db.update_investment(
             user_id=payload.user_id,
-            notification_id=payload.notification_id,
-            message=payload.message,
-            read=payload.read
+            investment_id=payload.investment_id,
+            type=payload.type,
+            amount_invested=payload.amount_invested,
+            current_value=payload.current_value,
+            date_invested=payload.date_invested,
+            notes=payload.notes
         )
         logging.info(message)
         return message
     except Exception as e:
-        logging.error(f"Error occurred while updating notification: {e}")
+        logging.error(f"Error occurred while updating investment: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")

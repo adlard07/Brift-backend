@@ -29,14 +29,27 @@ class GoalRequest(BaseModel):
     user_id: str
     goal_id: str
 
-class RecurringPaymentRequest(BaseModel):
-    user_id: str
-    payment_id: str
-
 class NotificationRequest(BaseModel):
     user_id: str
     notification_id: str
 
+class BillRequest(BaseModel):
+    user_id: str
+    bill_id: str
+
+class ReminderRequest(BaseModel):
+    user_id: str
+    reminder_id: str
+
+class DebtRequest(BaseModel):
+    user_id: str
+    debt_id: str
+
+class InvestmentRequest(BaseModel):
+    user_id: str
+    investment_id: str
+
+# Existing Delete Routes ...
 
 @router.delete('/user')
 async def delete_user(payload: UserRequest):
@@ -93,17 +106,6 @@ async def delete_goal(payload: GoalRequest):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 
-@router.delete('/recurring-payment')
-async def delete_recurring_payment(payload: RecurringPaymentRequest):
-    try:
-        message = delete_firebase_db.delete_recurring_payment(payload.user_id, payload.payment_id)
-        logging.info(message)
-        return message
-    except Exception as e:
-        logging.error(f"Error occurred while deleting recurring payment: {e}")
-        raise HTTPException(status_code=500, detail="Internal server error")
-
-
 @router.delete('/notification')
 async def delete_notification(payload: NotificationRequest):
     try:
@@ -112,4 +114,48 @@ async def delete_notification(payload: NotificationRequest):
         return message
     except Exception as e:
         logging.error(f"Error occurred while deleting notification: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.delete('/bill')
+async def delete_bill(payload: BillRequest):
+    try:
+        message = delete_firebase_db.delete_bill(payload.user_id, payload.bill_id)
+        logging.info(message)
+        return message
+    except Exception as e:
+        logging.error(f"Error occurred while deleting bill: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.delete('/reminder')
+async def delete_reminder(payload: ReminderRequest):
+    try:
+        message = delete_firebase_db.delete_reminder(payload.user_id, payload.reminder_id)
+        logging.info(message)
+        return message
+    except Exception as e:
+        logging.error(f"Error occurred while deleting reminder: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.delete('/debt')
+async def delete_debt(payload: DebtRequest):
+    try:
+        message = delete_firebase_db.delete_debt(payload.user_id, payload.debt_id)
+        logging.info(message)
+        return message
+    except Exception as e:
+        logging.error(f"Error occurred while deleting debt: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
+
+
+@router.delete('/investment')
+async def delete_investment(payload: InvestmentRequest):
+    try:
+        message = delete_firebase_db.delete_investment(payload.user_id, payload.investment_id)
+        logging.info(message)
+        return message
+    except Exception as e:
+        logging.error(f"Error occurred while deleting investment: {e}")
         raise HTTPException(status_code=500, detail="Internal server error")
