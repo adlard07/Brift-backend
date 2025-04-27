@@ -1,196 +1,264 @@
 import os
-import requests
-import json
-from dotenv import load_dotenv
 import uuid
+import json
 from datetime import date, datetime
+from typing import Optional
+
+import firebase_admin
+from firebase_admin import credentials, db
+from dataclasses import dataclass, field
+from dotenv import load_dotenv
 
 from logger import logging
 from database_ops.auth import FirebaseAuth
+from database_ops.services import DBServices
+
 
 # Load environment variables
 load_dotenv()
 
-def check_response(response) -> dict:
-    if response.status_code == 200:
-        return {"status_code": response.status_code, "data": response.json()}
-    else:
-        return {"status_code": response.status_code, "error": response.text}
 
+@dataclass
 class AddFirebase:
-    base_url: str = os.getenv("BASE_URL", "").rstrip("/")
-    auth_client: FirebaseAuth = FirebaseAuth()
+    auth_client: FirebaseAuth = field(default_factory=FirebaseAuth)
+    db_services: DBServices = field(default_factory=DBServices)
+    ref: db.Reference = field(init=False)
 
-    def get_access_token(self):
-        return self.auth_client.get_access_token()
 
-    def _put(self, endpoint: str, data: dict) -> dict:
-        """Reusable PUT request"""
-        access_token = self.get_access_token()
-        url = f"{self.base_url}/{endpoint}.json?access_token={access_token}"
-        response = requests.put(url, json=data)
-        return check_response(response)
+    def __post_init__(self):
+        self.ref = self.auth_client.initialize_firebase_app('user')
 
-    def check_user(self, email) -> bool:
-        """Checks if user exists"""
+
+    def create_user(self, profile: dict, settings: dict) -> dict:
+        """Creates a new user if email and phone are unique."""
         try:
-            access_token = self.get_access_token()
-            check_user_url = f"{self.base_url}/users.json?access_token={access_token}"
-            users = requests.get(check_user_url).json()
-            if users is None:
-                logging.info('User does not exist.')
-                return False
-            for user in users.values():
-                if isinstance(user, dict) and user.get('email') == email:
-                    logging.info('User exists.')
-                    return True
-            logging.info('User does not exist.')
-            return False
-        except Exception as e:
-            logging.error(f"Error checking user: {e}")
-            return False
+            logging.info(f"Profile: {profile}")
+            logging.info(f"Settings: {settings}")
 
-    def create_user(self, username: str, email: str, phone: str, password: str) -> dict:
-        """Creates a new user"""
-        try:
+            if not profile or not settings:
+                return {"error": "User data is incomplete.", "status_code": 400}
+
+            # Check if user with same email exists
+            existing_email = self.db_services.fetch_user_by_field(field_name='profile/email', value=profile['email'], ref=self.user_ref)
+            if existing_email and isinstance(existing_email, dict) and len(existing_email) > 0:
+                return {"status_code": 400, "error": "User email already exists."}
+
+            # Check if user with same phone exists
+            existing_phone = self.db_services.fetch_user_by_field(field_name='profile/phone', value=profile['phone'], ref=self.user_ref)
+            if existing_phone and isinstance(existing_phone, dict) and len(existing_phone) > 0:
+                return {"status_code": 400, "error": "User phone already exists."}
+
+            user_id = str(uuid.uuid4())
             user_data = {
-                "username": username,
-                "email": email,
-                "phone": phone,
-                "password": password,
-                "created_at": datetime.utcnow().isoformat()
+                "profile": profile,
+                "settings": settings
             }
-            if not self.check_user(email):
-                return self._put(f"users/{str(uuid.uuid1())}", user_data)
-            return {"status_code": 400, "error": "User already exists"}
+
+            self.ref.child(user_id).set(user_data)
+
+            return {
+                "status_code": 201,
+                "message": "User created successfully",
+                "user_id": user_id
+            }
+
         except Exception as e:
             logging.error(f"Error creating user: {e}")
+            return {"status_code": 500, "error": f"Internal server error: {str(e)}"}
+
+
+
+    def add_expense(self, expense: dict) -> dict:
+        """Adds an expense record to the given user's Firebase entry."""
+        try:
+            user_id = expense['user_id']
+            if not user_id:
+                return {"status_code": 404, "error": "User not found"}
+
+            expense_id = str(uuid.uuid4())
+            self.ref.child(user_id).child("expenses").child(expense_id).set(expense)
+
+            return {
+                "status_code": 201,
+                "message": f"Expense added for user {user_id}",
+                "expense_id": expense_id
+            }
+
+        except Exception as e:
+            logging.error(f"Error adding expense: {e}")
             return {"status_code": 500, "error": str(e)}
 
-    def add_expense(self, user_id: str, title: str, category: str, amount: float, 
-                    date: str = date.today().isoformat(), payment_method='UPI') -> dict:
-        expense_data = {
-            "title": title,
-            "category": category,
-            "amount": amount,
-            "date": date,
-            "payment_method": payment_method
-        }
-        return self._put(f"users/{user_id}/expenses/{str(uuid.uuid1())}", expense_data)
 
-    def add_budget(self, user_id: str, category: str, amount: float, period_in_days: int) -> dict:
-        budget_data = {
-            "category": category,
-            "amount": amount,
-            "period_in_days": period_in_days,
-            "created_at": datetime.utcnow().isoformat()
-        }
-        return self._put(f"users/{user_id}/budgets/{str(uuid.uuid1())}", budget_data)
+    def add_budget(self, budget: dict) -> dict:
+        try:
+            user_id = budget['user_id']
+            if not user_id:
+                return {"status_code": 404, "error": "User not found"}
 
-    def add_income(self, user_id: str, source: str, amount: float, frequency: str,
-                   date_received: str = date.today().isoformat()) -> dict:
-        income_data = {
-            "source": source,
-            "amount": amount,
-            "frequency": frequency,
-            "date_received": date_received
-        }
-        return self._put(f"users/{user_id}/income/{str(uuid.uuid1())}", income_data)
+            budget_id = str(uuid.uuid4())
 
-    def add_goals(self, user_id: str, title: str, target_amount: float, deadline: str) -> dict:
-        goal_data = {
-            "title": title,
-            "target_amount": target_amount,
-            "saved_amount": 0.0,
-            "deadline": deadline,
-            "status": "In Progress"
-        }
-        return self._put(f"users/{user_id}/goals/{str(uuid.uuid1())}", goal_data)
+            self.ref.child(user_id).child("budgets").child(budget_id).set(budget)
 
-    def add_recurring_payments(self, user_id: str, service_name: str, 
-                                amount: float, payment_date: str, frequency: str, 
-                                auto_deduct: bool = False) -> dict:
-        payment_data = {
-            "service_name": service_name,
-            "amount": amount,
-            "payment_date": payment_date,
-            "frequency": frequency,
-            "auto_deduct": auto_deduct
-        }
-        return self._put(f"users/{user_id}/recurring_payments/{str(uuid.uuid1())}", payment_data)
+            return {
+                "status_code": 201,
+                "message": f"Budget added for user {user_id}",
+                "budget_id": budget_id
+            }
 
-    def add_notification(self, user_id: str, message: str, type: str = "General") -> dict:
-        notification_data = {
-            "message": message,
-            "type": type,
-            "timestamp": datetime.utcnow().isoformat(),
-            "read": False
-        }
-        return self._put(f"users/{user_id}/notifications/{str(uuid.uuid1())}", notification_data)
+        except Exception as e:
+            logging.error(f"Error adding budget: {e}")
+            return {"status_code": 500, "error": str(e)}
 
 
-if __name__ == "__main__":
-    firebase_object = AddFirebase()
 
-    result = firebase_object.create_user(
-        username='albina',
-        email='albinadcuna1970@gmail.com',
-        phone='+919619886892',
-        password='albina',
-    )
+    def add_income(self, income) -> dict:
+        try:
+            user_id = income['user_id']
+            if not user_id:
+                return {"status_code": 404, "error": "User not found"}
 
-    user_id = 'f985826d-021f-11f0-ada1-00155d92ba78'
+            income_id = str(uuid.uuid4())
 
-    # Add Expense
-    result = firebase_object.add_expense(
-        user_id=user_id,
-        title="Lunch",
-        category="Food",
-        amount=250
-    )
-    logging.info(result)
+            self.ref.child(user_id).child("incomes").child(income_id).set(income)
 
-    # Add Budget
-    result = firebase_object.add_budget(
-        user_id=user_id,
-        category="Groceries",
-        amount=5000,
-        period_in_days=30
-    )
-    logging.info(result)
+            return {
+                "status_code": 201,
+                "message": f"Income added for user {user_id}",
+                "income_id": income_id
+            }
 
-    # Add Income
-    result = firebase_object.add_income(
-        user_id=user_id,
-        source="Freelance Work",
-        amount=25000,
-        frequency="Monthly"
-    )
-    logging.info(result)
+        except Exception as e:
+            logging.error(f"Error adding income: {e}")
+            return {"status_code": 500, "error": str(e)}
 
-    # Add Goal
-    result = firebase_object.add_goals(
-        user_id=user_id,
-        title="New Laptop",
-        target_amount=80000,
-        deadline="2025-12-31"
-    )
-    logging.info(result)
 
-    # Add Recurring Payment
-    result = firebase_object.add_recurring_payments(
-        user_id=user_id,
-        service_name="Netflix Subscription",
-        amount=500,
-        payment_date="2025-03-20",
-        frequency="Monthly",
-        auto_deduct=True
-    )
-    logging.info(result)
 
-    # Add Notification
-    result = firebase_object.add_notification(
-        user_id=user_id,
-        message="Budget alert! You’ve spent 80% of your Food budget."
-    )
-    logging.info(result)
+    def add_goals(self, goal: dict) -> dict:
+        try:
+            user_id = goal['user_id']
+            if not user_id:
+                return {"status_code": 404, "error": "User not found"}
+
+            goal_id = str(uuid.uuid4())
+
+            self.ref.child(user_id).child("goals").child(goal_id).set(goal)
+
+            return {
+                "status_code": 201,
+                "message": f"Goal added for user {user_id}",
+                "goal_id": goal_id
+            }
+
+        except Exception as e:
+            logging.error(f"Error adding goal: {e}")
+            return {"status_code": 500, "error": str(e)}
+
+
+
+    def add_bill(self, bill: dict) -> dict:
+        try:
+            user_id = bill['user_id']
+            if not user_id:
+                return {"status_code": 404, "error": "User not found"}
+
+            bill_id = str(uuid.uuid4())
+
+            self.ref.child(user_id).child("bills").child(bill_id).set(bill)
+
+            return {
+                "status_code": 201,
+                "message": f"Bill added for user {user_id}",
+                "bill_id": bill_id
+            }
+
+        except Exception as e:
+            logging.error(f"Error adding bill: {e}")
+            return {"status_code": 500, "error": str(e)}
+
+
+
+    def add_reminder(self, reminder: dict) -> dict:
+        try:
+            user_id = reminder['user_id']
+            if not user_id:
+                return {"status_code": 404, "error": "User not found"}
+
+            reminder_id = str(uuid.uuid4())
+
+            self.ref.child(user_id).child("reminders").child(reminder_id).set(reminder)
+
+            return {
+                "status_code": 201,
+                "message": f"Reminder added for user {user_id}",
+                "reminder_id": reminder_id
+            }
+
+        except Exception as e:
+            logging.error(f"Error adding reminder: {e}")
+            return {"status_code": 500, "error": str(e)}
+
+
+
+    def add_notification(self, notification: dict) -> dict:
+        try:
+            user_id = notification['user_id']
+            if not user_id:
+                return {"status_code": 404, "error": "User not found"}
+
+            notification_id = str(uuid.uuid4())
+
+            self.ref.child(user_id).child("notifications").child(notification_id).set(notification)
+
+            return {
+                "status_code": 201,
+                "message": f"Notification added for user {user_id}",
+                "notification_id": notification_id
+            }
+
+        except Exception as e:
+            logging.error(f"Error adding notification: {e}")
+            return {"status_code": 500, "error": str(e)}
+
+
+
+    def add_debt(self, debt: dict) -> dict:
+        try:
+            user_id = debt['user_id']
+            if not user_id:
+                return {"status_code": 404, "error": "User not found"}
+
+            debt_id = str(uuid.uuid4())
+
+            self.ref.child(user_id).child("debts").child(debt_id).set(debt)
+
+            return {
+                "status_code": 201,
+                "message": f"Debt added for user {user_id}",
+                "debt_id": debt_id
+            }
+
+        except Exception as e:
+            logging.error(f"Error adding debt: {e}")
+            return {"status_code": 500, "error": str(e)}
+
+
+
+    def add_investment(self, investment: dict) -> dict:
+        try:
+            user_id = investment['user_id']
+            if not user_id:
+                return {"status_code": 404, "error": "User not found"}
+
+            investment_id = str(uuid.uuid4())
+
+            self.ref.child(user_id).child("investments").child(investment_id).set(investment)
+
+            return {
+                "status_code": 201,
+                "message": f"Investment added for user {user_id}",
+                "investment_id": investment_id
+            }
+
+        except Exception as e:
+            logging.error(f"Error adding investment: {e}")
+            return {"status_code": 500, "error": str(e)}
