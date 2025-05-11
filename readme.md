@@ -1,6 +1,6 @@
-# 📊 SpendWise Backend
+# 📊 Brift Backend
 
-**A serverless backend API for SpendWise – A modern personal finance and budgeting mobile app, built with Python + FastAPI + Firebase Firestore.**
+**A serverless backend API for Brift – A modern personal finance and budgeting mobile app, built with Python + FastAPI + Firebase Firestore.**
 
 ---
 
@@ -118,15 +118,15 @@
 1. **Clone the repo**
 
 ```bash
-git clone https://github.com/adlard07/SpendWise-backend.git
-cd Spendwise-Backend
+git clone https://github.com/adlard07/Brift-backend.git
+cd Brift-Backend
 ```
 
 2. **Install dependencies**
 
 ```bash
-python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
+virtualenv venv
+venv/bin/activate  # or venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
@@ -175,13 +175,10 @@ FIREBASE_API_KEY=your-firebase-api-key
 
 ```bash
 # Activate virtual environment
-source venv/bin/activate
+venv\bin\activate
 
 # Start local server
 uvicorn main:app --reload --port 8000 --host 0.0.0.0
-
-# Run unit tests
-pytest
 ```
 
 ---
@@ -213,5 +210,5 @@ Compatible with:
 
 ## 🧑‍💻 Author
 
-**SpendWise Dev Team**  
+**Brift Dev Team**  
 *Built with 💸 by financial nerds.*
