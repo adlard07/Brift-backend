@@ -144,12 +144,6 @@ FIREBASE_API_KEY=your-firebase-api-key
 
 - Place your Firebase Admin SDK credentials file as `creds.json` in the root.
 
-5. **Run the server**
-
-```bash
-uvicorn main:app --reload
-```
-
 ---
 
 ## 🔐 Authentication
@@ -184,7 +178,7 @@ uvicorn main:app --reload
 source venv/bin/activate
 
 # Start local server
-uvicorn main:app --reload
+uvicorn main:app --reload --port 8000 --host 0.0.0.0
 
 # Run unit tests
 pytest
