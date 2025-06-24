@@ -11,7 +11,10 @@ dashboard
 		<!-- past 5 years -->
 		- all time
 
-	- savings and goals progress (list[int])
+	- budgets (list[int])
+		- budgets compared with expense amount
+
+	- savings (list[int])
 		- savings amount compared with expense amount
 
 	- add expense tab

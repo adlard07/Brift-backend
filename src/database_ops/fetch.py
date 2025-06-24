@@ -41,5 +41,5 @@ if __name__ == "__main__":
     fetch_db_object = FetchFirebase()
     user_id = 'd4df0759-3f8b-4a21-91a8-bd56229937df'
 
-    data = fetch_db_object.fetch_data(user_id, 'expenses')
+    data = fetch_db_object.fetch_data(user_id, 'budgets')
     print(data)

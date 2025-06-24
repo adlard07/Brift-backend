@@ -90,6 +90,9 @@ class Services:
 
 if __name__ == "__main__":
     db_services = Services()
+    user = db_services.fetch_user_by_field('profile/email', 'adelarddcunha@gmail.com')
+    print("User id:", list(user['data'])[0])
+
     text = "this is my plain text"
     encrypted = db_services.encrypt_text(text)
     print("Encrypted:", encrypted)

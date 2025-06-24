@@ -2,13 +2,14 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
 from logger import logging
-from src.database_ops.fetch_db import FetchFirebase
+from src.database_ops.fetch import FetchFirebase
+from src.models.QnA import QnA
 
 @dataclass(kw_only=True)
 class Dashboard:
     user_id: str
     fetch_db_object: FetchFirebase = field(default_factory=FetchFirebase)
-
+    qna: QnA = field(default_factory=QnA)
 
     def total_spending(self):
         todays_spending = 0
@@ -79,19 +80,34 @@ class Dashboard:
                 "all_time_spending": all_time_spending
                 }
 
-    # def savings_goal_progress(self):
+    def get_budgets(self):
+        try:
+            budgets = dict(self.fetch_db_object.fetch_data(self.user_id, 'budgets'))
+            logging.info(f"{len(budgets)} budgets found.")
+            return budgets['data']
+        except Exception as e:
+            logging.error(f"Error occured: {e}")
+
+    def get_transactions(self):
+        try:
+            transactions = dict(self.fetch_db_object.fetch_data(self.user_id, 'expenses'))
+            logging.info(f"{len(transactions)} transactions found.")
+            return transactions['data']
+        except Exception as e:
+            logging.error(f"Error occured: {e}")
+
+
+    # def get_savings(self):
     #     try:
-    #         pass
+    #         savings = dict(self.fetch_db_object.fetch_data(self.user_id, 'savings'))
     #     except Exception as e:
     #         logging.info(f"Error occured: {e}")
     #     finally:
     #         return 
 
-    
-
 
 if __name__=="__main__":
     user_id = "d4df0759-3f8b-4a21-91a8-bd56229937df"
     dashboard_object = Dashboard(user_id=user_id)
-    result = dashboard_object.total_spending()
+    result = dashboard_object.get_budgets()
     logging.info(result)

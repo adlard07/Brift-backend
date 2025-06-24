@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from src.database_ops.update_db import UpdateFirebase
+from src.database_ops.update import UpdateFirebase
 from logger import logging
 
 router = APIRouter(

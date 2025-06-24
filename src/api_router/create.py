@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 from typing import Optional
 
-from src.database_ops.create_db import AddFirebase
+from src.database_ops.create import AddFirebase
 from logger import logging
 
 
@@ -21,13 +21,13 @@ class UserRequest(BaseModel):
     email: str
     password: str
     phone: Optional[str] = None
-    device_id: str
-    points: int
-    store_unlocked: bool
-    mfa_enabled: bool
-    currency: str
-    region: str
-    backup_enabled: bool
+    device_id: Optional[str] = None
+    points: Optional[int] = 10
+    store_unlocked: Optional[bool] = False
+    mfa_enabled: Optional[bool] = False
+    currency: Optional[str] = "INR"
+    region: Optional[str] = "IND"
+    backup_enabled: Optional[bool] = False
     created_at: Optional[str] = str(datetime.now())
     last_login: Optional[str] = str(datetime.now())
 
@@ -38,7 +38,7 @@ class ExpenseRequest(BaseModel):
     notes: Optional[str] = ""
     payment_method: Optional[str] = "cash"
     is_recurring: Optional[bool] = False
-    date: Optional[str] = str(datetime.now())
+    date: Optional[str] = Field(default_factory=lambda: str(datetime.now()))
 
 class BudgetRequest(BaseModel):
     user_id: str
@@ -104,8 +104,11 @@ class InvestmentRequest(BaseModel):
 
 def handle_firebase_response(message: dict):
     if message.get("status_code") != 201:
-        raise HTTPException(status_code=message.get("status_code", 500), detail=message.get("error", "Unknown error"))
-    logging.info(message)
+        raise HTTPException(
+            status_code=message.get("status_code", 500), 
+            detail=message.get("error", "Unknown error")
+            )
+    logging.info(f"Add user message: {message}")
     return message
     
 
@@ -119,6 +122,7 @@ async def create_user(payload: UserRequest):
         settings = payload.dict(include={'currency', 'region', 'backup_enabled'})
 
         message = add_firebase_object.create_user(profile, settings)
+        logging.info(f"Add user message: {message}")
         return handle_firebase_response(message)
     except Exception as e:
         logging.error(f"Error occurred while adding new user: {e}")
@@ -128,8 +132,8 @@ async def create_user(payload: UserRequest):
 @router.post('/expenses')
 async def add_expense(payload: ExpenseRequest):
     try:
-        payload.dict()['date'] = datetime.now()
         message = add_firebase_object.add_expense(payload.dict())
+        logging.info(message)
         return handle_firebase_response(message)
     except Exception as e:
         logging.error(f"Error occurred while adding new expense: {e}")

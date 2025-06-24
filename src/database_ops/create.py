@@ -29,16 +29,22 @@ class AddFirebase:
                 return {"status_code": 400, "error": "User data is incomplete."}
 
             # Check if user with same email/phone exists
-            existing_email = bool(self.db_services.fetch_user_by_field(field_name='profile/email', value=profile['email']))
-            existing_phone = bool(self.db_services.fetch_user_by_field(field_name='profile/phone', value=profile['phone']))
-            if existing_email or existing_phone:
-                return {"status_code": 400, "error": "User already exists."}
+            existing_email = self.db_services.fetch_user_by_field(field_name='profile/email', value=profile['email'])
+            if existing_email['status_code']!=404:
+                return {"status_code": 400, "error": "Email already exists."}
+
+            existing_phone = self.db_services.fetch_user_by_field(field_name='profile/phone', value=profile['phone'])
+            if existing_phone['status_code']!=404:
+                return {"status_code": 400, "error": "Phone already exists."}
+
 
             profile['password'] = self.db_services.encrypt_text(profile['password'])
             if profile['phone']:
                 profile['mfa_enabled'] = True
 
             combined_data = {"profile": profile, "settings": settings}
+            logging.info(f'User data: {combined_data}')
+
             if not combined_data:
                 return {"status_code": 500, "error": "Failed to create user."}
 

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from src.database_ops.delete_db import DeleteFirebase
+from src.database_ops.delete import DeleteFirebase
 from logger import logging
 
 router = APIRouter(
